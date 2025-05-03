@@ -1,5 +1,10 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 import CourseImage from '@/components/CourseImage';
+import ModuleDetail from '@/components/ModuleDetail';
+import EnrollmentConfirmation from '@/components/EnrollmentConfirmation';
 
 // Sample courses data - in a real app, this would come from an API
 const courses = [
@@ -72,6 +77,13 @@ const courses = [
 // In a real application, this data would be fetched server-side
 export default function CoursePage({ params }: { params: { id: string } }) {
   const course = courses.find(c => c.id === params.id);
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  const [enrollmentResult, setEnrollmentResult] = useState<{
+    success: boolean;
+    message: string;
+    enrollmentData: any;
+    accessType: string;
+  } | null>(null);
   
   if (!course) {
     return (
@@ -85,8 +97,48 @@ export default function CoursePage({ params }: { params: { id: string } }) {
     );
   }
   
+  const enrollInCourse = async (isPaid: boolean) => {
+    try {
+      setIsEnrolling(true);
+      
+      const response = await fetch('/api/ai/enroll', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          courseId: course.id,
+          courseTitle: course.title,
+          level: course.level,
+          isPaid
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to enroll in course');
+      }
+      
+      const result = await response.json();
+      setEnrollmentResult(result);
+    } catch (error) {
+      console.error('Error enrolling in course:', error);
+      alert('Failed to enroll in course. Please try again later.');
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
+  
   return (
     <div>
+      {enrollmentResult && enrollmentResult.success && (
+        <EnrollmentConfirmation
+          courseTitle={course.title}
+          isPaid={enrollmentResult.accessType === 'full'}
+          enrollmentData={enrollmentResult.enrollmentData}
+          onClose={() => setEnrollmentResult(null)}
+        />
+      )}
+      
       <Link href="/courses" className="text-primary hover:underline inline-block mb-6">
         ← Back to Courses
       </Link>
@@ -119,16 +171,15 @@ export default function CoursePage({ params }: { params: { id: string } }) {
           <p className="mb-6">{course.description}</p>
           
           <h2 className="text-xl font-bold mb-4">Course Modules</h2>
-          <div className="space-y-4 mb-8">
+          <div className="space-y-1 mb-8">
             {course.modules.map((module, index) => (
-              <div key={index} className="border p-4 rounded hover:bg-gray-50 hover-card transition-colors">
-                <div className="flex justify-between">
-                  <h3 className="font-medium hover-text">
-                    Module {index + 1}: {module.title}
-                  </h3>
-                  <span className="text-gray-600 hover-text">{module.duration}</span>
-                </div>
-              </div>
+              <ModuleDetail
+                key={index}
+                moduleTitle={module.title}
+                courseTitle={course.title}
+                level={course.level}
+                duration={module.duration}
+              />
             ))}
           </div>
         </div>
@@ -144,14 +195,26 @@ export default function CoursePage({ params }: { params: { id: string } }) {
             <div className="bg-white p-4 rounded border mb-6 hover-card transition-all hover:shadow-md">
               <div className="text-2xl font-bold text-center mb-2 hover-text">Free</div>
               <div className="text-center text-gray-600 mb-4 hover-text">Limited Access</div>
-              <button className="btn-primary w-full mb-2">Enroll Free</button>
+              <button 
+                className="btn-primary w-full mb-2"
+                onClick={() => enrollInCourse(false)}
+                disabled={isEnrolling}
+              >
+                {isEnrolling ? 'Processing...' : 'Enroll Free'}
+              </button>
               <div className="text-sm text-gray-600">No credit card required</div>
             </div>
             
             <div className="bg-white p-4 rounded border mb-6 hover-card transition-all hover:shadow-md">
               <div className="text-2xl font-bold text-center mb-2 hover-text">$49.99</div>
               <div className="text-center text-gray-600 mb-4 hover-text">Full Access</div>
-              <button className="btn-primary w-full mb-2">Enroll Now</button>
+              <button 
+                className="btn-primary w-full mb-2"
+                onClick={() => enrollInCourse(true)}
+                disabled={isEnrolling}
+              >
+                {isEnrolling ? 'Processing...' : 'Enroll Now'}
+              </button>
               <div className="text-sm text-gray-600">30-day money-back guarantee</div>
             </div>
             

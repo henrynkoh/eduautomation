@@ -1,41 +1,8 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import crypto from 'crypto';
 
-// More sophisticated hash function for deterministic but nice-looking images
-function createImageHash(prompt: string): string {
-  // Create a hash based on the prompt (simple version)
-  let hash = 0;
-  for (let i = 0; i < prompt.length; i++) {
-    const char = prompt.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  
-  // Convert to hex and ensure it's always positive
-  const hexHash = Math.abs(hash).toString(16);
-  
-  // Use some known good seeds for educational content
-  const goodImageSeeds = [
-    'a5b57', 'e82f1', '3d9c2', 'b7f8e', 'f1d45',
-    'c68d3', '9ae52', '4b76c', 'd2e19', '7c3f8'
-  ];
-  
-  // Use the hash to pick from our good seeds
-  const seedIndex = Math.abs(hash) % goodImageSeeds.length;
-  return goodImageSeeds[seedIndex];
-}
-
-// Mock image generation function since we don't have direct access to image generation APIs
-// In a real implementation, you would use an image generation API like DALL-E or Stable Diffusion
-async function generateImageUrl(prompt: string): Promise<string> {
-  // For demo purposes, we'll use Picsum to get random placeholder images
-  // In production, replace with actual AI image generation API
-  const hash = createImageHash(prompt);
-  
-  // Use a larger image size with a different aspect ratio for better course images
-  return `https://picsum.photos/seed/${hash}/1200/800`;
-}
-
+// This is a simulated AI image generation
+// In a real application, you would call a service like DALL-E or Stable Diffusion
 export async function POST(request: Request) {
   try {
     const { courseTitle, courseDescription } = await request.json();
@@ -47,15 +14,55 @@ export async function POST(request: Request) {
       );
     }
     
-    // Create a prompt for image generation based on course details
-    const prompt = `Educational image for a course titled "${courseTitle}". ${
-      courseDescription ? `The course covers: ${courseDescription}` : ''
-    }. Create a professional, clean image suitable for an online learning platform.`;
+    // Generate a deterministic hash based on the course title
+    // This ensures the same course always gets the same image
+    const hash = crypto.createHash('md5').update(courseTitle).digest('hex');
     
-    // Generate image URL
-    const imageUrl = await generateImageUrl(prompt);
+    // Use the hash to select a background color and pattern
+    const colorIndex = parseInt(hash.substring(0, 2), 16) % 6;
+    const patternIndex = parseInt(hash.substring(2, 4), 16) % 4;
     
-    return NextResponse.json({ imageUrl });
+    // Set of background gradient colors
+    const gradients = [
+      'from-blue-500 to-indigo-600', // Blueish
+      'from-purple-500 to-pink-500', // Purple-pink
+      'from-green-400 to-cyan-500',  // Greenish
+      'from-yellow-400 to-orange-500', // Yellowish
+      'from-red-500 to-pink-500',    // Reddish
+      'from-gray-700 to-gray-900',   // Dark gray
+    ];
+    
+    // Set of patterns or imagery that could be associated with the course
+    const patterns = [
+      'blocks',      // Container blocks (Docker-like)
+      'network',     // Network connections (workflow-like)
+      'chip',        // Circuit/AI related
+      'code',        // Code snippets
+    ];
+    
+    // Select a gradient and pattern based on the hash
+    const gradient = gradients[colorIndex];
+    const pattern = patterns[patternIndex];
+    
+    // Generate a simulated URL that would point to a real image
+    // In production, this would be the URL returned by the image generation API
+    const imageUrl = `/images/courses/${pattern}-${colorIndex}.jpg`;
+    
+    // This would be asynchronous in a real application
+    console.log(`Generated image for course: ${courseTitle} using ${pattern} pattern with ${gradient} colors`);
+    
+    // Add a small random delay to simulate API latency
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 500 + 100));
+    
+    return NextResponse.json({ 
+      imageUrl,
+      metadata: {
+        title: courseTitle,
+        description: courseDescription || '',
+        pattern,
+        gradient
+      }
+    });
   } catch (error: any) {
     console.error('Error generating image:', error);
     

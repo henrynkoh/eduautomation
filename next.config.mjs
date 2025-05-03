@@ -8,6 +8,16 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['n8n-workflow'],
   },
+  // Configure allowed image sources
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        pathname: '**',
+      },
+    ],
+  },
 };
 
 export default nextConfig; 
