@@ -22,9 +22,21 @@ export default function RootLayout({
             <h1 className="text-xl font-bold">EduAutomation</h1>
             <nav>
               <ul className="flex space-x-4">
-                <li><a href="/" className="hover:underline">Home</a></li>
-                <li><a href="/courses" className="hover:underline">Courses</a></li>
-                <li><a href="/workflows" className="hover:underline">Workflows</a></li>
+                <li>
+                  <a href="/" className="hover:text-white hover:bg-primary-dark px-3 py-2 rounded transition-colors">
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a href="/courses" className="hover:text-white hover:bg-primary-dark px-3 py-2 rounded transition-colors">
+                    Courses
+                  </a>
+                </li>
+                <li>
+                  <a href="/workflows" className="hover:text-white hover:bg-primary-dark px-3 py-2 rounded transition-colors">
+                    Workflows
+                  </a>
+                </li>
               </ul>
             </nav>
           </div>

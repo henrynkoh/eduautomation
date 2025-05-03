@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CourseImage from '@/components/CourseImage';
 
 // Sample courses data - in a real app, this would come from an API
 const courses = [
@@ -93,10 +94,12 @@ export default function CoursePage({ params }: { params: { id: string } }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Course main content */}
         <div className="lg:col-span-2">
-          <div className="aspect-video bg-gray-200 mb-6 flex items-center justify-center">
-            {/* Image placeholder - in a real app, use Next.js Image component */}
-            <div className="text-gray-400">Course Image</div>
-          </div>
+          <CourseImage 
+            title={course.title} 
+            description={course.description}
+            className="mb-6 rounded"
+            showTitleOverlay={true}
+          />
           
           <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
           
@@ -118,12 +121,12 @@ export default function CoursePage({ params }: { params: { id: string } }) {
           <h2 className="text-xl font-bold mb-4">Course Modules</h2>
           <div className="space-y-4 mb-8">
             {course.modules.map((module, index) => (
-              <div key={index} className="border p-4 rounded hover:bg-gray-50">
+              <div key={index} className="border p-4 rounded hover:bg-gray-50 hover-card transition-colors">
                 <div className="flex justify-between">
-                  <h3 className="font-medium">
+                  <h3 className="font-medium hover-text">
                     Module {index + 1}: {module.title}
                   </h3>
-                  <span className="text-gray-600">{module.duration}</span>
+                  <span className="text-gray-600 hover-text">{module.duration}</span>
                 </div>
               </div>
             ))}
@@ -138,16 +141,16 @@ export default function CoursePage({ params }: { params: { id: string } }) {
               Join thousands of students already learning on EduAutomation.
             </p>
             
-            <div className="bg-white p-4 rounded border mb-6">
-              <div className="text-2xl font-bold text-center mb-2">Free</div>
-              <div className="text-center text-gray-600 mb-4">Limited Access</div>
+            <div className="bg-white p-4 rounded border mb-6 hover-card transition-all hover:shadow-md">
+              <div className="text-2xl font-bold text-center mb-2 hover-text">Free</div>
+              <div className="text-center text-gray-600 mb-4 hover-text">Limited Access</div>
               <button className="btn-primary w-full mb-2">Enroll Free</button>
               <div className="text-sm text-gray-600">No credit card required</div>
             </div>
             
-            <div className="bg-white p-4 rounded border mb-6">
-              <div className="text-2xl font-bold text-center mb-2">$49.99</div>
-              <div className="text-center text-gray-600 mb-4">Full Access</div>
+            <div className="bg-white p-4 rounded border mb-6 hover-card transition-all hover:shadow-md">
+              <div className="text-2xl font-bold text-center mb-2 hover-text">$49.99</div>
+              <div className="text-center text-gray-600 mb-4 hover-text">Full Access</div>
               <button className="btn-primary w-full mb-2">Enroll Now</button>
               <div className="text-sm text-gray-600">30-day money-back guarantee</div>
             </div>
@@ -155,10 +158,10 @@ export default function CoursePage({ params }: { params: { id: string } }) {
             <div className="text-sm text-gray-600">
               <div className="font-bold mb-2">This course includes:</div>
               <ul className="space-y-2">
-                <li>✓ {course.modules.length} modules</li>
-                <li>✓ Lifetime access</li>
-                <li>✓ Practical exercises</li>
-                <li>✓ Certificate of completion</li>
+                <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> {course.modules.length} modules</li>
+                <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> Lifetime access</li>
+                <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> Practical exercises</li>
+                <li className="flex items-center"><span className="text-green-500 mr-2">✓</span> Certificate of completion</li>
               </ul>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CourseImage from '@/components/CourseImage';
 
 // Sample course data - in a real application, this would come from an API
 const courses = [
@@ -80,27 +81,31 @@ export default function CoursesPage() {
       {/* Course list */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => (
-          <div key={course.id} className="card">
-            <div className="aspect-video bg-gray-200 mb-4 flex items-center justify-center">
-              {/* Image placeholder - in a real app, use Next.js Image component */}
-              <div className="text-gray-400">Course Image</div>
+          <div key={course.id} className="card overflow-hidden">
+            <CourseImage 
+              title={course.title} 
+              description={course.description}
+              className="mb-4"
+              showTitleOverlay={true}
+            />
+            <div className="p-4">
+              <h2 className="text-xl font-bold mb-2">{course.title}</h2>
+              <p className="text-gray-600 mb-4">{course.description}</p>
+              <div className="flex justify-between mb-4">
+                <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                  {course.level}
+                </span>
+                <span className="text-sm text-gray-600">
+                  {course.duration}
+                </span>
+              </div>
+              <Link 
+                href={`/courses/${course.id}`}
+                className="btn-primary inline-block"
+              >
+                View Course
+              </Link>
             </div>
-            <h2 className="text-xl font-bold mb-2">{course.title}</h2>
-            <p className="text-gray-600 mb-4">{course.description}</p>
-            <div className="flex justify-between mb-4">
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                {course.level}
-              </span>
-              <span className="text-sm text-gray-600">
-                {course.duration}
-              </span>
-            </div>
-            <Link 
-              href={`/courses/${course.id}`}
-              className="btn-primary inline-block"
-            >
-              View Course
-            </Link>
           </div>
         ))}
       </div>

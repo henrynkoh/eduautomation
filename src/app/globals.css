@@ -27,4 +27,39 @@ body {
   .card {
     @apply border rounded-lg p-4 shadow-sm hover:shadow transition-shadow;
   }
+
+  /* Improved hover states with better text contrast */
+  .hover-card:hover .hover-text {
+    @apply text-gray-900 dark:text-white font-medium;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Overlay styling for text on images */
+  .image-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-black/70 to-transparent;
+  }
+
+  .image-text {
+    @apply relative z-10 text-white font-medium;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Improved card readability on hover */
+  .card:hover {
+    @apply bg-gray-50 dark:bg-gray-800;
+  }
+
+  /* Button hover states */
+  .btn-primary:hover {
+    @apply bg-primary/90 shadow-md;
+  }
+
+  /* Links with better hover states */
+  a:not(.btn-primary) {
+    @apply transition-colors;
+  }
+  
+  a:not(.btn-primary):hover {
+    @apply text-primary/90 underline;
+  }
 } 
