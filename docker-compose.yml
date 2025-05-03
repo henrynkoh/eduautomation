@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # Main EduAutomation web application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MCP_SERVER_URL=http://mcp:5680
+      - N8N_URL=http://n8n:5678
+    depends_on:
+      - n8n
+      - mcp
+    networks:
+      - eduautomation-network
+    restart: unless-stopped
+
+  # n8n for workflow automation
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - N8N_AUTH_DISABLED=true
+      - WEBHOOK_URL=http://n8n:5678/
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - eduautomation-network
+    restart: unless-stopped
+
+  # MCP server for AI integration
+  mcp:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    ports:
+      - "5680:5680"
+    environment:
+      - PORT=5680
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      - mcp_data:/app/data
+    networks:
+      - eduautomation-network
+    restart: unless-stopped
+
+networks:
+  eduautomation-network:
+    driver: bridge
+
+volumes:
+  n8n_data:
+  mcp_data: 
